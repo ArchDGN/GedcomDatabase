@@ -1,0 +1,135 @@
+0 HEAD
+
+0 @I1@ INDI
+  1 NAME John /Begood/
+  1 SEX M
+  1 FAMS @F1@
+
+0 @I2@ INDI
+  1 NAME Ada /Begood/
+  1 SEX F
+  1 FAMS @F1@
+
+0 @I3@ INDI
+  1 NAME Fred /Begood/
+  1 SEX M
+  1 FAMC @F1@
+  1 FAMS @F2@
+
+0 @I4@ INDI
+  1 NAME Lea /Begood/
+  1 SEX F
+  1 FAMC @F1@
+  1 FAMS @F3@
+
+0 @I5@ INDI
+  1 NAME Emma /Begood/
+  1 SEX F
+  1 FAMC @F1@
+  1 FAMS @F4@
+
+0 @I6@ INDI
+  1 NAME Mark /Begood/
+  1 SEX M
+  1 FAMC @F1@
+  1 FAMS @F5@
+
+0 @F1@ FAM
+  1 HUSB @I1@
+  1 WIFE @I2@
+  1 CHIL @I3@
+  1 CHIL @I4@
+  1 CHIL @I5@
+  1 CHIL @I6@
+
+0 @I7@ INDI
+  1 NAME Anna /Green/
+  1 SEX F
+  1 FAMS @F2@
+
+0 @I8@ INDI
+  1 NAME Lucas /Begood/
+  1 SEX M
+  1 FAMC @F2@
+
+0 @I9@ INDI
+  1 NAME Julia /Begood/
+  1 SEX F
+  1 FAMC @F2@
+
+0 @F2@ FAM
+  1 HUSB @I3@
+  1 WIFE @I7@
+  1 CHIL @I8@
+  1 CHIL @I9@
+
+0 @I10@ INDI
+  1 NAME Sam /White/
+  1 SEX M
+  1 FAMS @F3@
+
+0 @I11@ INDI
+  1 NAME Nora /White/
+  1 SEX F
+  1 FAMC @F3@
+
+0 @I12@ INDI
+  1 NAME Max /White/
+  1 SEX M
+  1 FAMC @F3@
+
+0 @I13@ INDI
+  1 NAME Zoe /White/
+  1 SEX F
+  1 FAMC @F3@
+
+0 @F3@ FAM
+  1 HUSB @I10@
+  1 WIFE @I4@
+  1 CHIL @I11@
+  1 CHIL @I12@
+  1 CHIL @I13@
+
+0 @I14@ INDI
+  1 NAME Tom /River/
+  1 SEX M
+  1 FAMS @F4@
+
+0 @I15@ INDI
+  1 NAME Chloe /River/
+  1 SEX F
+  1 FAMC @F4@
+
+0 @F4@ FAM
+  1 HUSB @I14@
+  1 WIFE @I5@
+  1 CHIL @I15@
+
+0 @I16@ INDI
+  1 NAME Kate /Brown/
+  1 SEX F
+  1 FAMS @F5@
+
+0 @I17@ INDI
+  1 NAME Hugo /Begood/
+  1 SEX M
+  1 FAMC @F5@
+
+0 @I18@ INDI
+  1 NAME Mia /Begood/
+  1 SEX F
+  1 FAMC @F5@
+
+0 @I19@ INDI
+  1 NAME Leo /Begood/
+  1 SEX M
+  1 FAMC @F5@
+
+0 @F5@ FAM
+  1 HUSB @I6@
+  1 WIFE @I16@
+  1 CHIL @I17@
+  1 CHIL @I18@
+  1 CHIL @I19@
+
+0 TRLR
