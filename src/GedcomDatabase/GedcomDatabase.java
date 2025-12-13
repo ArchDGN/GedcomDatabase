@@ -30,44 +30,34 @@ public class GedcomDatabase {
 
     }
 
-    private void verifierUniqueIndividus(Individu individu) throws GedcomDatabaseExceptionIndividu {
-        for (Individu ind : individus.values()) {
-            if (ind.getId().equals(individu.getId())) {
-                throw new GedcomDatabaseExceptionIndividu("ID Individu dupliqué entre : " + ind + " et " + individu);
-            }
-        }
-    }
-
-    private void verifierUniqueFamilles(Famille famille) throws GedcomDatabaseExceptionFamille {
-        for (Famille fam : familles.values()) {
-            if (fam.getId().equals(famille.getId())) {
-                throw new GedcomDatabaseExceptionFamille("ID Famille dupliqué entre : " + fam.getId() + " et " + famille.getId());
-            }
-        }
-    }
-
     // Méthodes pour ajouter des individus et des familles
     public void ajouterIndividu(Individu individu) {
-        try {
-            verifierUniqueIndividus(individu);
-        } catch (GedcomDatabaseExceptionIndividu e) {
-            System.err.println(e.getMessage());
-            System.err.println("ID unique non respecté, individu non ajouté : " + individu);
-            return;
+        if (individuExiste(individu.getId().toString())) {
+            System.err.println("ID unique non respecté, individu non ajouté : " + individu.getId());
+        } else {
+            individus.put(individu.getId().toString(), individu);
         }
-
-        individus.put(individu.getId(), individu);
     }
 
     public void ajouterFamille(Famille famille) {
-        try {
-            verifierUniqueFamilles(famille);
-        } catch (GedcomDatabaseExceptionFamille e) {
-            System.err.println(e.getMessage());
+        if (familleExiste(famille.getId().toString())) {
             System.err.println("ID unique non respecté, famille non ajoutée : " + famille.getId());
             return;
         }
-        familles.put(famille.getId(), famille);
+
+        familles.put(famille.getId().toString(), famille);
+    }
+
+    public boolean individuExiste(String individuId) {
+        return individus.containsKey(individuId);
+    }
+
+    public boolean familleExiste(String familleId) {
+        return familles.containsKey(familleId);
+    }
+
+    public Individu getIndividuById(String individuId) {
+        return individus.get(individuId);
     }
 
     // Getters

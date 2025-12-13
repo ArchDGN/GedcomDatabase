@@ -15,19 +15,10 @@ public class GedcomParser {
     private final GedcomDatabase gedcomDatabase;
 
     // États du parser
+    private int mode = 0; // 0 = individus, 1 = familles
     private String currentId = null;
     private Individu currentIndividu = null;
     private Famille currentFamille = null;
-
-    // Variables temporaires pour remplir les objets
-    private String tempNom = "";
-    private String tempPrenom = "";
-    private String tempSexe = "";
-
-    private String tempMari = "";
-    private String tempFemme = "";
-    private Set<String> tempEnfants = new HashSet<>();
-    private String tempObjet = "";
 
     public GedcomParser(GedcomDatabase gedcomDatabase) {
         this.gedcomDatabase = gedcomDatabase;
@@ -35,23 +26,47 @@ public class GedcomParser {
 
     public void readFile(String filePath) throws GedcomParserException {
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        // ===== PASSE 1 : INDIVIDUS =====
+        mode = 0;
+        resetParserState();
 
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 try {
                     parseLine(line.trim());
                 } catch (InvalidParserTagException | InvalidParseLevelException e) {
-                    System.err.println("Erreur parsing ligne : " + e.getMessage());
+                    // Ignoré en passe 1
                 }
             }
-
-            // Finalise le dernier bloc
             closeCurrentObject();
-
         } catch (IOException e) {
-            throw new GedcomParserException("Erreur de lecture du fichier : " + e.getMessage());
+            throw new GedcomParserException("Erreur lecture (passe 1) : " + e.getMessage());
         }
+
+        // ===== PASSE 2 : FAMILLES =====
+        mode = 1;
+        resetParserState();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                try {
+                    parseLine(line.trim());
+                } catch (InvalidParserTagException | InvalidParseLevelException e) {
+                    // Ignoré en passe 2
+                }
+            }
+            closeCurrentObject();
+        } catch (IOException e) {
+            throw new GedcomParserException("Erreur lecture (passe 2) : " + e.getMessage());
+        }
+    }
+
+    private void resetParserState() {
+        currentIndividu = null;
+        currentFamille = null;
+        currentId = null;
     }
 
     private void parseLine(String line) throws InvalidParserTagException, InvalidParseLevelException {
@@ -72,19 +87,13 @@ public class GedcomParser {
                 System.err.println("Erreur fermeture bloc : " + e.getMessage());
             }
 
-            if (value.equals("INDI")) {
-                currentId = tag;
-                tempNom = "";
-                tempPrenom = "";
-                tempSexe = "";
-                currentIndividu = new Individu("", "", "", "");
+            if (value.equals("INDI") && mode == 0) {
+                currentIndividu = new Individu(null, null, null);
+                currentIndividu.setId(tag);
             }
-            else if (value.equals("FAM")) {
-                currentId = tag;
-                tempMari = "";
-                tempFemme = "";
-                tempEnfants = new HashSet<>();
-                currentFamille = new Famille("", "", "", new HashSet<>());
+            else if (value.equals("FAM") && mode == 1) {
+                currentFamille = new Famille(null, null, null, null, null);
+                currentFamille.setId(tag);
             }
 
             return;
@@ -95,17 +104,11 @@ public class GedcomParser {
             switch (tag) {
                 case "NAME":
                     // Format : Prénom /Nom/
-                    String[] nameParts = value.split(" /");
-                    tempPrenom = nameParts[0].trim();
-                    try {
-                        tempNom = nameParts[1].replace("/", "").trim();
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        tempNom = "";
-                    }
+                    currentIndividu.setNom(value);
                     break;
 
                 case "SEX":
-                    tempSexe = value.trim();
+                    currentIndividu.setSexe(value.trim());
                     break;
 
                 case "FAMS":
@@ -122,19 +125,19 @@ public class GedcomParser {
         if (currentFamille != null) {
             switch (tag) {
                 case "HUSB":
-                    tempMari = value.trim().replaceAll("@", "");
+                    currentFamille.setMariWithId(value.trim().replaceAll("@", ""), gedcomDatabase);
                     break;
 
                 case "WIFE":
-                    tempFemme = value.trim().replaceAll("@", "");
+                    currentFamille.setFemmeWithId(value.trim().replaceAll("@", ""), gedcomDatabase);
                     break;
 
                 case "CHIL":
-                    tempEnfants.add(value.trim().replaceAll("@", ""));
+                    currentFamille.addEnfantWithId(value.trim().replaceAll("@", ""), gedcomDatabase);
                     break;
 
                 case "OBJ":
-                    tempObjet = value.trim();
+                    currentFamille.setObjet(value);
                     break;
                 default :
                     throw new InvalidParserTagException("Tag non supporté : " + tag);
@@ -155,38 +158,23 @@ public class GedcomParser {
         String emptyExceptionMessage = "L'individu " + currentId + " a des champs vides : ";
 
         if (currentIndividu != null) {
-            if (tempPrenom.isEmpty()) {
-                emptyExceptionMessage += "ne contient pas de PRENOM; ";
-                hasEmpty = true;
-            }
-            if (tempNom.isEmpty()) {
+            if (currentIndividu.getNom() == null) {
                 emptyExceptionMessage += "ne contient pas de nom; ";
                 hasEmpty = true;
             }
-            if (tempSexe.isEmpty()) {
+            if (currentIndividu.getSexe() == null) {
                 emptyExceptionMessage += "ne contient pas de tag SEX;";
                 hasEmpty = true;
             }
-
-            currentIndividu.setId(currentId);
-            currentIndividu.setNom(tempNom);
-            currentIndividu.setPrenom(tempPrenom);
-            currentIndividu.setSexe(tempSexe);
 
             gedcomDatabase.ajouterIndividu(currentIndividu);
         }
 
         if (currentFamille != null) {
-            if (tempMari.isEmpty() && tempFemme.isEmpty()) {
+            if (currentFamille.getMari() == null && currentFamille.getFemme() == null) {
                 emptyExceptionMessage = "La famille " + currentId + " ne contient ni HUSB ni WIFE.";
                 hasEmpty = true;
             }
-
-            currentFamille.setId(currentId);
-            currentFamille.setMariId(tempMari);
-            currentFamille.setFemmeId(tempFemme);
-            currentFamille.setEnfantsIds(tempEnfants);
-            currentFamille.setObjet(tempObjet);
 
             gedcomDatabase.ajouterFamille(currentFamille);
         }
