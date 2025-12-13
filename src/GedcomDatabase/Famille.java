@@ -98,6 +98,7 @@ public class Famille {
                 ", mari=" + (mari != null ? mari : "null") +
                 ", femme=" + (femme != null ? femme : "null") +
                 ", enfants=" + enfants +
+                ", objet=" + objet +
                 '}';
     }
 

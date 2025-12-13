@@ -1,9 +1,9 @@
 package GedcomDatabase;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 import GedcomExceptions.*;
+import GedcomTag.*;
 
 public class GedcomDatabase {
     private final Map<String, Individu> individus;
@@ -27,8 +27,9 @@ public class GedcomDatabase {
     }
 
     public void afficherArbre(String individuId) {
-
+        System.out.println("Arbre généalogique de l'individu " + individuId + ":");
     }
+
 
     // Méthodes pour ajouter des individus et des familles
     public void ajouterIndividu(Individu individu) {
