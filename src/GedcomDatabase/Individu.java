@@ -56,6 +56,14 @@ public class Individu {
     public void setSexe(GedcomSex sexe) { this.sexe = sexe; }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Individu)) return false;
+        Individu other = (Individu) obj;
+        return id.equals(other.id);
+    }
+
+    @Override
     public String toString() {
         return "Individu{" +
                 "id=" + id +

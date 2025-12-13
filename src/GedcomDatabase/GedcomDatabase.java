@@ -9,6 +9,8 @@ public class GedcomDatabase {
     private final Map<String, Individu> individus;
     private final Map<String, Famille> familles;
 
+    Set<String> dejaAffiche = new HashSet<>();
+
     // Constructeur
     public GedcomDatabase() {
         individus = new HashMap<>();
@@ -27,8 +29,55 @@ public class GedcomDatabase {
     }
 
     public void afficherArbre(String individuId) {
-        System.out.println("Arbre généalogique de l'individu " + individuId + ":");
+        afficherArbre(individuId, 0);
     }
+
+    private void afficherArbre(String individuId, int niveau) {
+
+        if (dejaAffiche.contains(individuId)) {
+            return;
+        }
+        dejaAffiche.add(individuId);
+
+        Individu individu = individus.get(individuId);
+        if (individu == null) return;
+
+        String indent = "  ".repeat(niveau);
+        System.out.println(indent + " " + individu.getNom());
+
+        for (Famille famille : familles.values()) {
+
+            if (famille.chercherIndividuDansFamille(individuId)) {
+
+                System.out.println(indent + "  Famille " + famille.getId());
+
+                if (famille.getMari() != null) {
+                    System.out.println(indent + "    Mari : " + famille.getMari().getNom());
+                }
+                if (famille.getFemme() != null) {
+                    System.out.println(indent + "    Femme : " + famille.getFemme().getNom());
+                }
+
+                System.out.println(indent + "    Enfants :");
+                if (famille.getEnfants() != null && !famille.getEnfants().isEmpty()) {
+                    for (Individu enfant : famille.getEnfants()) {
+                        System.out.println(indent + "      - " + enfant.getNom());
+                    }
+                } else {
+                    System.out.println(indent + "      Aucun enfant");
+                }
+
+                // récursion UNIQUEMENT si l'individu est parent
+                if (famille.chercherIndividuParent(individuId)) {
+
+                    for (Individu enfant : famille.getEnfants()) {
+                        afficherArbre(enfant.getId().toString(), niveau + 1);
+                    }
+                }
+            }
+        }
+    }
+
 
 
     // Méthodes pour ajouter des individus et des familles

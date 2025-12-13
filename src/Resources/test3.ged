@@ -132,4 +132,19 @@
   1 CHIL @I18@
   1 CHIL @I19@
 
+ 0 @I20@ INDI
+   1 NAME Paul /Martin/
+   1 SEX M
+   1 FAMS @F6@
+
+ 0 @I21@ INDI
+   1 NAME Emma /Begood/
+   1 SEX F
+   1 FAMC @F6@
+
+  0 @F6@ FAM
+    1 HUSB @I20@
+    1 WIFE @I9@
+    1 CHIL @I21@
+
 0 TRLR

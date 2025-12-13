@@ -91,6 +91,33 @@ public class Famille {
         }
     }
 
+    public boolean chercherIndividuDansFamille(String individuId) {
+        if (mari != null && mari.getId().toString().equals(individuId)) {
+            return true;
+        }
+        if (femme != null && femme.getId().toString().equals(individuId)) {
+            return true;
+        }
+        if (enfants != null) {
+            for (Individu enfant : enfants) {
+                if (enfant.getId().toString().equals(individuId)) {
+                    return true;
+                }
+            }
+        }
+        return false; // Individu non trouvé dans cette famille
+    }
+
+    public boolean chercherIndividuParent(String individuId) {
+        if (mari != null && mari.getId().toString().equals(individuId)) {
+            return true;
+        }
+        if (femme != null && femme.getId().toString().equals(individuId)) {
+            return true;
+        }
+        return false; // Individu non trouvé comme parent dans cette famille
+    }
+
     @Override
     public String toString() {
         return "Famille{" +
